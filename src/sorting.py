@@ -46,6 +46,11 @@ def cmp_reverse(a, b):
     >>> cmp_reverse(322, 322)
     0
     '''
+    if a < b:
+        return 1
+    if b < a:
+        return -1
+    return 0
 
 
 def cmp_invert(cmp):
@@ -148,6 +153,13 @@ def cmp_nan_first(a, b):
     >>> cmp_nan_first(float('nan'), float('nan'))
     0
     '''
+    if math.isnan(a):
+        if math.isnan(b):
+            return 0
+        return -1
+    if math.isnan(b):
+        return 1
+    return cmp_standard(a, b)
 
 
 def _natural_chunks(s):
@@ -234,6 +246,30 @@ def _merged(xs, ys, cmp=cmp_standard, reverse=False):
     >>> _merged([1, 3, float('nan')], [2], cmp=cmp_nan_last)
     [1, 2, 3, nan]
     '''
+    out = []
+    i = 0
+    j = 0
+    while i < len(xs) and j < len(ys):
+        compare = cmp(xs[i], ys[j])
+
+        if reverse:
+            if compare >= 0:
+                out.append(xs[i])
+                i += 1
+            else:
+                out.append(ys[j])
+                j += 1
+        else:
+            if compare <= 0:
+                out.append(xs[i])
+                i += 1
+            else:
+                out.append(ys[j])
+                j += 1
+
+    out += xs[i:]
+    out += ys[j:]
+    return out
 
 
 def merge_sorted(xs, cmp=cmp_standard, reverse=False):
@@ -261,6 +297,13 @@ def merge_sorted(xs, cmp=cmp_standard, reverse=False):
     >>> merge_sorted(['file10', 'file2', 'file1'], cmp=cmp_natural)
     ['file1', 'file2', 'file10']
     '''
+    if len(xs) <= 1:
+        return xs[:]
+    else:
+        mid = len(xs) // 2
+        left = merge_sorted(xs[:mid], cmp=cmp, reverse=reverse)
+        right = merge_sorted(xs[mid:], cmp=cmp, reverse=reverse)
+        return _merged(left, right, cmp=cmp, reverse=reverse)
 
 
 def quick_sorted(xs, cmp=cmp_standard, reverse=False):
@@ -295,6 +338,30 @@ def quick_sorted(xs, cmp=cmp_standard, reverse=False):
     >>> quick_sorted([float('nan'), 1, 5, 2, 3], cmp=cmp_nan_first)
     [nan, 1, 2, 3, 5]
     '''
+    if len(xs) <= 1:
+        return xs[:]
+
+    pivot = random.choice(xs)
+    less_than = []
+    equal = []
+    greater_than = []
+
+    for x in xs:
+        order = cmp(x, pivot)
+        if order < 0:
+            less_than.append(x)
+        elif order > 0:
+            greater_than.append(x)
+        else:
+            equal.append(x)
+
+    sorted_less = quick_sorted(less_than, cmp=cmp, reverse=reverse)
+    sorted_greater = quick_sorted(greater_than, cmp=cmp, reverse=reverse)
+
+    if reverse:
+        return sorted_greater + equal + sorted_less
+    else:
+        return sorted_less + equal + sorted_greater
 
 
 def quick_sort(xs, cmp=cmp_standard, reverse=False):
@@ -328,3 +395,35 @@ def quick_sort(xs, cmp=cmp_standard, reverse=False):
     >>> xs
     ['file2', 'file10']
     '''
+    def partition(lo, hi):
+        pivot = xs[hi]
+        i = lo
+
+        for j in range(lo, hi):
+            order = cmp(xs[j], pivot)
+            if reverse:
+                if order >= 0:
+                    swap = True
+                else:
+                    swap  = False
+            else:
+                if order <= 0:
+                    swap = True
+                else:
+                    swap = False
+
+            if swap:
+                xs[i], xs[j] = xs[j], xs[i]
+                i += 1
+
+        xs[i], xs[hi] = xs[hi], xs[i]
+        return i
+
+    def _quick_sort(lo, hi):
+        if lo < hi:
+            p = partition(lo, hi)
+            _quick_sort(lo, p - 1)
+            _quick_sort(p + 1, hi)
+
+    if len(xs) > 1:
+        _quick_sort(0, len(xs) - 1)
