@@ -108,7 +108,7 @@ def test__quick_sorted_memory(str1):
     str1_copy = copy.deepcopy(str1)
     str1 = list(str1)
     quick_sorted(str1)
-    assert str1
+    assert str1 == str1_copy
 
 
 @given(str1=ints)
