@@ -40,8 +40,24 @@ def merge_intervals(intervals):
     enough.  Whenever the next interval starts at or before the end of
     the last merged one, extend it; otherwise start a new interval.
     '''
+    if not intervals:
+        return []
+
     def key(interval):
         return interval[0]
+    sorted_intervals = sorted(intervals, key=key)
+    merged = [sorted_intervals[0]]
+
+    for current in sorted_intervals[1:]:
+        last_start, last_end = merged[-1]
+        curr_start, curr_end = current
+
+        if curr_start <= last_end:
+            merged[-1][1] = max(last_end, curr_end)
+        else:
+            merged.append(current)
+
+    return merged
 
 
 def rank_teams(votes):
@@ -74,11 +90,23 @@ def rank_teams(votes):
     '''
     # counts[team][i] is the number of voters who ranked `team`
     # in position i -- fill this in before sorting.
-    counts = {}
+    if not votes:
+        return ""
+
+    num_positions = len(votes[0])
+    counts = {team: [0] * num_positions for team in votes[0]}
+
+    #count number of votes per position
+    for i in votes:
+        for pos, team in enumerate(i):
+            counts[team][pos] += 1
 
     def key(team):
         # negated counts sort descending; the letter breaks ties
         return tuple(-n for n in counts[team]) + (team,)
+
+    sorted_teams = sorted(counts.keys(), key=key)
+    return "".join(sorted_teams)
 
 
 def largest_number(nums):
@@ -108,6 +136,14 @@ def largest_number(nums):
             return -1
         return 1 if b + a > a + b else 0
 
+    num_to_str = [str(x) for x in nums]
+    num_to_str.sort(key=functools.cmp_to_key(cmp))
+
+    if num_to_str[0] == '0':
+        return '0'
+
+    return "".join(str_nums)
+
 
 def two_city_sched_cost(costs):
     '''
@@ -136,3 +172,14 @@ def two_city_sched_cost(costs):
     '''
     def key(cost):
         return cost[0] - cost[1]
+
+    costs_sorted = sorted(costs, key=key)
+    n = len(costs) // 2
+
+    total_cost = 0
+    for i in range(n):
+        total_cost += costs_sorted[i][0]
+    for i in range(n, 2 * n):
+        total_cost += costs_sorted[i][1]
+
+    return total_cost
