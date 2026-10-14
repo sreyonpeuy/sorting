@@ -16,6 +16,8 @@ CSCI148: Graph Algorithms will teach you how to solve problems like this
 without needing any hints.
 '''
 
+import functools
+
 
 def merge_intervals(intervals):
     '''
@@ -96,7 +98,7 @@ def rank_teams(votes):
     num_positions = len(votes[0])
     counts = {team: [0] * num_positions for team in votes[0]}
 
-    #count number of votes per position
+    # count number of votes per position
     for i in votes:
         for pos, team in enumerate(i):
             counts[team][pos] += 1
@@ -142,7 +144,7 @@ def largest_number(nums):
     if num_to_str[0] == '0':
         return '0'
 
-    return "".join(str_nums)
+    return "".join(num_to_str)
 
 
 def two_city_sched_cost(costs):
