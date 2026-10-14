@@ -17,6 +17,7 @@ equivalently, the result of every call to cmp is negated.
 import math
 import random
 
+
 def cmp_standard(a, b):
     '''
     used for sorting from lowest to highest
@@ -311,7 +312,7 @@ def quick_sorted(xs, cmp=cmp_standard, reverse=False):
     Quicksort is like mergesort,
     but it uses a different strategy to split the list.
     Instead of splitting the list down the middle,
-    a "pivot" value is randomly selected, 
+    a "pivot" value is randomly selected,
     and the list is split into a "less than" sublist and a "greater than" sublist.
 
     The pseudocode is:
@@ -405,7 +406,7 @@ def quick_sort(xs, cmp=cmp_standard, reverse=False):
                 if order >= 0:
                     swap = True
                 else:
-                    swap  = False
+                    swap = False
             else:
                 if order <= 0:
                     swap = True
